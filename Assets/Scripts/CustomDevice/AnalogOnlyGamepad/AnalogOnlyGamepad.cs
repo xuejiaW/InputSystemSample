@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -42,44 +40,7 @@ public class AnalogOnlyGamepad : InputDevice, IInputUpdateCallbackReceiver
 
         InputSystem.RegisterLayout<AnalogOnlyGamepad>(matches: new InputDeviceMatcher()
                                                          .WithProduct(productRegex));
-
-        // When gamepad connected and no OnlyGamepad, add OnlyGamepad 
-        if (Gamepad.current != null && !InputSystem.devices.Any(MatchProduct))
-            AddDevice();
-
-        InputSystem.onDeviceChange += OnDeviceChanged;
-        return;
-
-        bool MatchProduct(InputDevice device) => Regex.IsMatch(device.description.product, productRegex);
-
-        void OnDeviceChanged(InputDevice device, InputDeviceChange change)
-        {
-            if (device is Gamepad && change == InputDeviceChange.Added)
-                AddDevice();
-            else if (device is Gamepad && change == InputDeviceChange.Removed)
-                RemoveDevice();
-        }
-
-        void RemoveDevice()
-        {
-            List<InputDevice> toRemoveList = InputSystem.devices.Where(MatchProduct).ToList();
-            toRemoveList.ForEach(InputSystem.RemoveDevice);
-        }
-
-        void AddDevice()
-        {
-            AddDeviceImpl("Trigger");
-            AddDeviceImpl("Stick");
-
-            void AddDeviceImpl(string usage)
-            {
-                InputDevice device = InputSystem.AddDevice(new InputDeviceDescription
-                {
-                    product = $"{usage}OnlyGamepad"
-                });
-                InputSystem.SetDeviceUsage(device, usage);
-            }
-        }
+        PartialGamepadCreator.BindWithGamepadCreation("OnlyGamepad", new List<string> {"Trigger", "Stick"});
     }
 
     protected override void FinishSetup()
