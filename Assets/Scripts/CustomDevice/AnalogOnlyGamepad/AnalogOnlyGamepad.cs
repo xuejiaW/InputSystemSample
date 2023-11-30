@@ -36,11 +36,11 @@ public class AnalogOnlyGamepad : InputDevice, IInputUpdateCallbackReceiver
 
     static AnalogOnlyGamepad()
     {
-        string productRegex = ".*OnlyGamepad";
+        string productSuffix = "OnlyGamepad";
 
         InputSystem.RegisterLayout<AnalogOnlyGamepad>(matches: new InputDeviceMatcher()
-                                                         .WithProduct(productRegex));
-        PartialGamepadCreator.BindWithGamepadCreation("OnlyGamepad", new List<string> {"Trigger", "Stick"});
+                                                         .WithProduct($".*{productSuffix}"));
+        PartialGamepadCreator.BindWithGamepadCreation(productSuffix, new List<string> {"Trigger", "Stick"});
     }
 
     protected override void FinishSetup()
